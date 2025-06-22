@@ -62,7 +62,7 @@ const ProjectDetail = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Visit Website
+              <span><i class="fa-solid fa-globe"></i> Visit Website </span>
             </a>
             <a
               className="inline-block bg-sky-900 text-white font-medium py-2 px-6 rounded hover:bg-blue-700 transition duration-300"
@@ -70,7 +70,7 @@ const ProjectDetail = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Source Code
+             <span><i class="fa-solid fa-code"></i> Source Code</span> 
             </a>
           </div>
         </div>
