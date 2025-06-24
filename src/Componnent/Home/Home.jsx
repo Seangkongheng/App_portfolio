@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import bgImage from "../../assets/images/bg.jpg";
-import profileImage from "../../assets/images/profile.jpg";
 import axios from "axios";
+
+// Define animation variants for reusability
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1] } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
+};
 
 const Home = () => {
   const [name, setName] = useState([]);
@@ -11,11 +21,10 @@ const Home = () => {
     axios
       .get("http://localhost:8000/api/home")
       .then((response) => {
-        console.log(setName(response.data.names)); // Access the 'names' key from the response
         setName(response.data.names);
       })
       .catch((error) => {
-        console.log("Error fetching data:", error);
+        console.error("Error fetching data:", error);
       });
   }, []);
 
@@ -25,61 +34,70 @@ const Home = () => {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <motion.div
-        className="home-profile text-center bg-black bg-opacity-50 p-8 rounded-lg shadow-lg"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1 }}
+        className="home-profile text-center bg-black bg-opacity-50 p-8 rounded-lg shadow-lg max-w-md w-full"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
-        {/* Profile Image */}
-        <motion.div
-          className="profile-image w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          <img
-            src={profileImage}
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </motion.div>
+        {name.length === 0 ? (
+          <p className="text-white">Loading...</p>
+        ) : (
+          name.map((item, index) => (
+            <div key={index}>
+              {/* Profile Image */}
+              <motion.div
+                className="profile-image w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto"
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.3, duration: 0.8 }}
+              >
+                <img
+                  src={item.image_url}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                />
+              </motion.div>
 
-        {name.map((item) => (
-          <motion.h1
-            className="profile-name mt-6 text-white text-3xl font-bold"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1 }}
-          >
-            {item.name}
-          </motion.h1>
-        ))}
-        {/* Name */}
-        {/* Position */}
+              {/* Name */}
+              <motion.h1
+                className="profile-name mt-6 text-white text-3xl font-bold"
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.6 }}
+              >
+                {item.name}
+              </motion.h1>
 
-        {name.map((item) => (
-          <motion.p
-            className="profile-position text-white text-lg mt-2"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.2 }}
-          >
-            {item.description}
-          </motion.p>
-        ))}
+              {/* Position/Description */}
+              <motion.p
+                className="profile-position text-white text-lg mt-2"
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.9 }}
+              >
+                {item.position}
+              </motion.p>
+            </div>
+          ))
+        )}
 
         {/* Social Media Links */}
         <motion.div
           className="profile-social-media mt-6 flex justify-center space-x-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 1.2 }}
         >
           <a
             href="https://www.linkedin.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-500 text-2xl"
+            className="text-white hover:text-blue-500 text-2xl transition-colors"
           >
             <i className="fa-brands fa-linkedin"></i>
           </a>
@@ -87,7 +105,7 @@ const Home = () => {
             href="https://www.facebook.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-600 text-2xl"
+            className="text-white hover:text-blue-600 text-2xl transition-colors"
           >
             <i className="fa-brands fa-square-facebook"></i>
           </a>
@@ -95,7 +113,7 @@ const Home = () => {
             href="https://www.tiktok.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-black text-2xl"
+            className="text-white hover:text-black text-2xl transition-colors"
           >
             <i className="fa-brands fa-tiktok"></i>
           </a>
@@ -103,29 +121,29 @@ const Home = () => {
             href="https://telegram.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 text-2xl"
+            className="text-white hover:text-blue-400 text-2xl transition-colors"
           >
             <i className="fa-brands fa-telegram"></i>
           </a>
-
           <a
-            href="https://telegram.org"
+            href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 text-2xl"
+            className="text-white hover:text-blue-400 text-2xl transition-colors"
           >
-            <i class="fa-brands fa-github"></i>
+            <i className="fa-brands fa-github"></i>
           </a>
         </motion.div>
 
-        {/* Hire Me Button */}
+        {/* Download CV Button */}
         <motion.div
           className="profile-button-hire-me mt-8"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, delay: 2 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 1.5 }}
         >
-          <button className="px-6 py-3 cursor-pointer rounded-full btn-hiring-me text-white font-semibold hover:bg-blue-600 transition">
+          <button className="px-6 py-3 cursor-pointer rounded-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-colors">
             Download CV
           </button>
         </motion.div>

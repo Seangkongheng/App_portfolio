@@ -44,9 +44,9 @@ function App() {
           <Route path="/blog/:id" element={<BlogDetail />} />
 
           {/* Work and Project routes */}
-          <Route path="/works" element={<WorkDetail />} />
-          <Route path="/projects" element={<Project />} />
-          <Route path="/projects/detail" element={<ProjectDetail />} />
+          <Route path="/works/:id" element={<WorkDetail />} />
+          <Route path="/projects/:id" element={<Project />} />
+          <Route path="/projects/detail/:id" element={<ProjectDetail />} />
         </Routes>
         <Footer />
       </div>

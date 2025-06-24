@@ -4,6 +4,8 @@ import web1 from "../../../../assets/images/web1.png";
 import web2 from "../../../../assets/images/web2.png";
 import web3 from "../../../../assets/images/web3.png";
 import { motion } from "framer-motion";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const ProjectDetail = () => {
   const slides = [web1, image1, web2, web3];
@@ -14,13 +16,12 @@ const ProjectDetail = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
 
-  // Auto-slide functionality
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 3000); // Change slide every 3 seconds
+    }, 3000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, [slides.length]);
 
   const handleNext = () => {
@@ -35,6 +36,32 @@ const ProjectDetail = () => {
     setCurrentSlide(index);
   };
 
+  const [project, setProject] = useState(null);
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8000/api/project/show/${id}`)
+      .then((Response) => {
+        setProject(Response.data.project);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("Error fetching data:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-color text-white">
+        <div className="flex items-center gap-3 text-xl font-semibold animate-pulse">
+          <i className="fa-solid fa-spinner fa-spin text-2xl"></i>
+          Loading...
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-color text-white min-h-screen">
       {/* Breadcrumb */}
@@ -45,9 +72,7 @@ const ProjectDetail = () => {
       {/* Blog Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Blog Title */}
-        <h1 className="text-4xl font-bold mb-6 text-center">
-          Understanding Tailwind CSS: A Beginner’s Guide
-        </h1>
+        <h1 className="text-4xl font-bold mb-6 text-center">{project?.name}</h1>
         {/* Website Link Preview */}
         <div className=" bg-gray-900 text-white rounded-lg shadow-md p-6 text-center my-6">
           <h2 className="text-2xl font-bold mb-2">Explore the Full Project</h2>
@@ -58,19 +83,24 @@ const ProjectDetail = () => {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
             <a
               className="inline-block bg-blue-600 text-white font-medium py-2 px-6 rounded hover:bg-sky-900 transition duration-300"
-              href="https://www.youtube.com/watch?v=Z1MuP27SdjI"
+              href={project?.link_web}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span><i class="fa-solid fa-globe"></i> Visit Website </span>
+              <span>
+                <i class="fa-solid fa-globe"></i> Visit Website{" "}
+              </span>
             </a>
+
             <a
               className="inline-block bg-sky-900 text-white font-medium py-2 px-6 rounded hover:bg-blue-700 transition duration-300"
-              href="https://www.youtube.com/watch?v=Z1MuP27SdjI"
+              href={project.url}
               target="_blank"
               rel="noopener noreferrer"
             >
-             <span><i class="fa-solid fa-code"></i> Source Code</span> 
+              <span>
+                <i class="fa-solid fa-code"></i> Source Code
+              </span>
             </a>
           </div>
         </div>
@@ -85,20 +115,22 @@ const ProjectDetail = () => {
         >
           {/* Carousel Wrapper */}
           <div className="relative h-80 overflow-hidden rounded-lg md:h-[600px]">
-            {slides.map((slide, index) => (
-              <div
-                key={index}
-                className={`absolute block w-full h-full transition-opacity duration-700 ease-in-out ${
-                  index === currentSlide ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <img
-                  src={slide}
-                  alt={`Slide ${index + 1}`}
-                  className="absolute block w-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                />
-              </div>
-            ))}
+            {project.image_urls &&
+              project.image_urls.length > 0 &&
+              project.image_urls.map((url, index) => (
+                <div
+                  key={index}
+                  className={`absolute block w-full h-full transition-opacity duration-700 ease-in-out ${
+                    index === currentSlide ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <img
+                    src={url}
+                    alt={`Project Image ${index + 1}`}
+                    className="absolute block w-full h-full object-cover rounded-lg"
+                  />
+                </div>
+              ))}
           </div>
 
           {/* Indicators */}
@@ -168,35 +200,24 @@ const ProjectDetail = () => {
         {/* Blog Metadata */}
         <div className="flex justify-between items-center text-gray-400 text-sm mb-8 mt-5">
           <p>
-            Published on: <span className="text-blue-400">May 02 2025</span>
+            Published on:{" "}
+            <span className="text-blue-400">
+              {" "}
+              {new Date(project.created_at).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </span>
           </p>
           <p>
-            Author: <span className="text-blue-400">Seang Kongheng</span>
+            Author: <span className="text-blue-400">{project?.author}</span>
           </p>
         </div>
 
         {/* Blog Content */}
         <div className="text-gray-300 leading-relaxed">
-          <p className="mb-4">
-            Tailwind CSS is a utility-first CSS framework that allows developers
-            to build modern and responsive designs quickly. It provides a set of
-            pre-defined classes that can be directly applied to HTML elements,
-            eliminating the need to write custom CSS for most use cases.
-          </p>
-          <p className="mb-4">
-            In this guide, we’ll explore the basics of Tailwind CSS, how to set
-            it up in your project, and some tips for using it effectively.
-            Whether you’re a beginner or an experienced developer, Tailwind CSS
-            can help you streamline your workflow and create beautiful designs
-            effortlessly.
-          </p>
-          <p className="mb-4">
-            One of the key benefits of Tailwind CSS is its flexibility. You can
-            customize the framework to match your project’s design requirements
-            by modifying the configuration file. Additionally, Tailwind CSS
-            supports responsive design out of the box, making it easy to create
-            layouts that look great on any device.
-          </p>
+          <p className="mb-4">{project?.description}</p>
         </div>
       </div>
     </div>
