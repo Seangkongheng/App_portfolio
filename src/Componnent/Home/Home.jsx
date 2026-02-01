@@ -19,7 +19,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/home")
+      .get(import.meta.env.VITE_API_URL)
       .then((response) => {
         setName(response.data.names);
       })
