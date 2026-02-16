@@ -10,7 +10,7 @@ const Blog = () => {
   const [blogPosts, setBlog] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/home")
+      .get(`${import.meta.env.VITE_API_URL}home`)
       .then((response) => {
         setBlog(response.data.blog || []);
       })

@@ -1,153 +1,135 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import bgImage from "../../assets/images/bg.jpg";
 import axios from "axios";
 
-// Define animation variants for reusability
-const containerVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1] } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
-};
-
 const Home = () => {
-  const [name, setName] = useState([]);
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL)
+      .get(`${import.meta.env.VITE_API_URL}home`)
       .then((response) => {
-        setName(response.data.names);
+        setProfile(response.data.names[0]);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
   }, []);
 
+  if (!profile) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black text-white">
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="relative w-full h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: `url(${bgImage})` }}
-    >
-      <motion.div
-        className="home-profile text-center bg-black bg-opacity-50 p-8 rounded-lg shadow-lg max-w-md w-full"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+    <div className=" bg-black/80 backdrop-blur-sm">
+      {/* Main Hero Section */}
+      <div
+        className="relative  min-h-screen bg-cover bg-center flex items-center overflow-hidden"
+        style={{ backgroundImage: `url(${bgImage})` }}
       >
-        {name.length === 0 ? (
-          <p className="text-white">Loading...</p>
-        ) : (
-          name.map((item, index) => (
-            <div key={index}>
-              {/* Profile Image */}
-              <motion.div
-                className="profile-image w-40 h-40 rounded-full overflow-hidden border-4 border-blue-500 mx-auto"
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.3, duration: 0.8 }}
-              >
-                <img
-                  src={item.image_url}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-              </motion.div>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
 
-              {/* Name */}
-              <motion.h1
-                className="profile-name mt-6 text-white text-3xl font-bold"
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.6 }}
-              >
-                {item.name}
-              </motion.h1>
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-6 grid md:grid-cols-2 gap-12 items-center">
+          {/* LEFT SIDE - Text & Info */}
+          <motion.div
+            initial={{ opacity: 0, x: -60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-blue-400 text-lg mb-3 font-medium tracking-wide">
+              👋 Hello, I'm
+            </h2>
 
-              {/* Position/Description */}
-              <motion.p
-                className="profile-position text-white text-lg mt-2"
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.9 }}
+            <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+              {profile.name}
+            </h1>
+
+            <h3 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 bg-clip-text text-transparent mb-6">
+              {/* Full Stack Engineer | Laravel & React Specialist */}
+              {profile.position}
+            </h3>
+
+            <p className="text-gray-300 max-w-lg mb-8 text-lg leading-relaxed">
+              I build scalable, secure, and high-performance web applications.
+              Specialized in REST APIs, JWT authentication, and Microservice
+              Architecture. Focused on clean code, maintainable systems, and
+              responsive UI.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4 mb-8">
+              <a
+                href="/projects"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg font-semibold text-white shadow-lg hover:shadow-blue-500/50 transition transform hover:scale-105"
               >
-                {item.position}
-              </motion.p>
+                View Projects
+              </a>
+
+              <a
+                href="/contact"
+                className="px-8 py-3 border-2 border-blue-500 text-blue-400 hover:bg-blue-500/10 rounded-lg font-semibold transition transform hover:scale-105 hover:border-purple-500 hover:text-purple-400"
+              >
+                Contact Me
+              </a>
             </div>
-          ))
-        )}
 
-        {/* Social Media Links */}
-        <motion.div
-          className="profile-social-media mt-6 flex justify-center space-x-6"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 1.2 }}
-        >
-          <a
-            href="https://www.linkedin.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-500 text-2xl transition-colors"
-          >
-            <i className="fa-brands fa-linkedin"></i>
-          </a>
-          <a
-            href="https://www.facebook.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-600 text-2xl transition-colors"
-          >
-            <i className="fa-brands fa-square-facebook"></i>
-          </a>
-          <a
-            href="https://www.tiktok.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-black text-2xl transition-colors"
-          >
-            <i className="fa-brands fa-tiktok"></i>
-          </a>
-          <a
-            href="https://telegram.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 text-2xl transition-colors"
-          >
-            <i className="fa-brands fa-telegram"></i>
-          </a>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 text-2xl transition-colors"
-          >
-            <i className="fa-brands fa-github"></i>
-          </a>
-        </motion.div>
+            {/* Tech Tags */}
+            <div className="flex flex-wrap gap-3 text-sm text-gray-400">
+              {[
+                "Laravel",
+                "React",
+                "Microservices",
+                "REST API",
+                "MySQL",
+                "Linux",
+                "PHP",
+                "Angular",
+                "Express",
+                "Tailwind CSS",
+                "Git",
+                "bootrap",
+              ].map((tech, i) => (
+                <span
+                  key={i}
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </motion.div>
 
-        {/* Download CV Button */}
-        <motion.div
-          className="profile-button-hire-me mt-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 1.5 }}
-        >
-          <button className="px-6 py-3 cursor-pointer rounded-full bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-colors">
-            Download CV
-          </button>
-        </motion.div>
-      </motion.div>
+          {/* RIGHT SIDE - Profile Image */}
+          <motion.div
+            initial={{ opacity: 0, x: 60 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="flex justify-center"
+          >
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-3xl opacity-70 group-hover:opacity-100 transition duration-500"></div>
+
+              <img
+                src={profile.image_url}
+                alt="Profile"
+                className="relative w-72 h-72 md:w-80 md:h-80 rounded-full object-cover border-4 border-white shadow-2xl transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-gray-400 animate-bounce text-2xl">
+          ↓
+        </div>
+      </div>
     </div>
   );
 };

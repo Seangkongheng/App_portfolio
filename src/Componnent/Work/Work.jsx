@@ -30,7 +30,7 @@ const Work = () => {
 
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL)
+      .get(`${import.meta.env.VITE_API_URL}home`)
       .then((response) => {
         setSkills(response.data.skill || []);
         setLoading(false);
